@@ -1,0 +1,95 @@
+"""research.py tests — Exa searcher + Groq client fully mocked, no live API."""
+from types import SimpleNamespace
+
+import pytest
+
+from app.research import BriefGenerationError, generate_brief
+
+
+def _groq_response(text):
+    """Mimic groq client.chat.completions.create(...) return shape."""
+    msg = SimpleNamespace(content=text)
+    choice = SimpleNamespace(message=msg)
+    return SimpleNamespace(choices=[choice])
+
+
+class FakeGroq:
+    def __init__(self, text=None, raise_exc=None):
+        self._text = text
+        self._raise = raise_exc
+        self.calls = 0
+        self.last_messages = None
+        self.chat = SimpleNamespace(
+            completions=SimpleNamespace(create=self._create)
+        )
+
+    def _create(self, **kwargs):
+        self.calls += 1
+        self.last_messages = kwargs.get("messages")
+        if self._raise:
+            raise self._raise
+        return _groq_response(self._text)
+
+
+def _searcher(results):
+    return lambda company: list(results)
+
+
+SAMPLE_RESULTS = [
+    {"title": "Flexport overview", "url": "https://flexport.com/about", "text": "Digital freight forwarder."},
+    {"title": "Flexport news", "url": "https://news.example.com/flexport", "text": "Layoffs in 2023."},
+]
+
+
+def test_happy_path_returns_markdown_and_sources():
+    md = "## Company Snapshot\nFlexport. https://flexport.com/about"
+    groq = FakeGroq(text=md)
+    result = generate_brief("Flexport", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS))
+    assert result["markdown"] == md
+    assert "https://flexport.com/about" in result["sources"]
+    assert groq.calls == 1
+
+
+def test_research_excerpts_are_passed_into_the_prompt():
+    groq = FakeGroq(text="## Company Snapshot\nok")
+    generate_brief("Flexport", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS))
+    user_turn = groq.last_messages[1]["content"]
+    assert "https://news.example.com/flexport" in user_turn
+    assert "Layoffs in 2023." in user_turn
+
+
+def test_no_search_results_raises():
+    groq = FakeGroq(text="should not be called")
+    with pytest.raises(BriefGenerationError):
+        generate_brief("Nowhere Inc", groq_client=groq, searcher=_searcher([]))
+    assert groq.calls == 0  # never reaches synthesis
+
+
+def test_search_failure_is_wrapped():
+    def boom(company):
+        raise RuntimeError("exa down")
+
+    with pytest.raises(BriefGenerationError):
+        generate_brief("Acme", groq_client=FakeGroq(text="x"), searcher=boom)
+
+
+def test_groq_error_is_wrapped():
+    groq = FakeGroq(raise_exc=RuntimeError("503 overloaded"))
+    with pytest.raises(BriefGenerationError):
+        generate_brief("Acme", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS))
+
+
+def test_empty_completion_raises():
+    groq = FakeGroq(text="")
+    with pytest.raises(BriefGenerationError):
+        generate_brief("Acme", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS))
+
+
+def test_sources_fall_back_to_results_when_brief_omits_urls():
+    groq = FakeGroq(text="## Company Snapshot\nNo URLs cited in body.")
+    result = generate_brief("Flexport", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS))
+    # Brief cited none, so sources fall back to the result URLs.
+    assert result["sources"] == [
+        "https://flexport.com/about",
+        "https://news.example.com/flexport",
+    ]

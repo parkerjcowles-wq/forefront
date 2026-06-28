@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: forefront
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      # Secrets — set these in the Render dashboard, never commit them.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: EXA_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.12.3

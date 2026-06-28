@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Forefront — Prospect Intelligence</title>
+  <meta name="description" content="Sourced, call-ready account briefs on any company in seconds." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css?v=2" />
+</head>
+<body>
+  <div class="paper">
+    <header class="masthead reveal" style="--d:0">
+      <div class="masthead__rule"></div>
+      <div class="masthead__row">
+        <div class="wordmark">Forefront</div>
+        <nav class="masthead__meta">
+          <span>Prospect Intelligence</span>
+          <span class="dot">·</span>
+          <span id="issue-date">The Account Desk</span>
+        </nav>
+      </div>
+      <div class="masthead__rule masthead__rule--thin"></div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="kicker reveal" style="--d:1">Pre-call intelligence, in one page</p>
+        <h1 class="reveal" style="--d:2">
+          Walk into every call<br />
+          already <em>briefed</em>.
+        </h1>
+        <p class="lede reveal" style="--d:3">
+          Name any company. Forefront researches the live web and writes the
+          one-page account brief a top sales rep would prep before a discovery
+          call — stack, pain signals, decision-makers, and the questions that
+          open the deal.
+        </p>
+      </section>
+
+      <section class="console reveal" style="--d:4">
+        <form id="brief-form" class="search" autocomplete="off">
+          <input
+            id="company"
+            class="search__input"
+            type="text"
+            placeholder="Enter a company — e.g. project44"
+            aria-label="Company name"
+            maxlength="80"
+          />
+          <button id="submit" class="search__btn" type="submit">
+            Generate <span aria-hidden="true">&rarr;</span>
+          </button>
+        </form>
+
+        <div class="samples">
+          <span class="samples__label">Or pull a sample dossier</span>
+          <div class="chips" id="chips">
+            <button class="chip" data-slug="project44">project44</button>
+            <button class="chip" data-slug="flexport">Flexport</button>
+            <button class="chip" data-slug="kinaxis">Kinaxis</button>
+            <button class="chip" data-slug="honeywell">Honeywell</button>
+            <button class="chip" data-slug="lindt">Lindt &amp; Sprüngli</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="status" class="status" hidden aria-live="polite">
+        <span class="status__mark"></span>
+        <span id="status-text" class="status__text">Researching…</span>
+      </section>
+
+      <section id="error" class="error" hidden aria-live="polite"></section>
+
+      <article id="brief" class="brief" hidden>
+        <div class="brief__dateline">
+          <p class="brief__eyebrow" id="brief-eyebrow">Account Brief</p>
+          <h2 class="brief__company" id="brief-company"></h2>
+          <p class="brief__meta" id="brief-meta"></p>
+        </div>
+        <div class="brief__body" id="brief-body"></div>
+      </article>
+    </main>
+
+    <footer class="colophon">
+      <div class="masthead__rule masthead__rule--thin"></div>
+      <p>
+        Forefront · Prospect Intelligence Agent — a portfolio project by Parker Cowles.
+        Briefs are generated live from public web sources; verify names and figures before any call.
+      </p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="/app.js?v=3"></script>
+</body>
+</html>
