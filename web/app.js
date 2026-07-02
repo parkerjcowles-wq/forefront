@@ -79,11 +79,16 @@
         "Generated " + today() + " · " + (data.cached ? "from this session" : "live web research");
     }
 
-    var html = window.marked ? marked.parse(data.markdown || "") : (data.markdown || "");
-    // Live briefs are synthesized from untrusted web content, so sanitize the
-    // rendered HTML before injecting it (marked does not escape HTML on its own).
-    if (window.DOMPurify) html = DOMPurify.sanitize(html);
-    briefBody.innerHTML = html;
+    // Live briefs are synthesized from untrusted web content. Only inject HTML
+    // when BOTH the renderer and the sanitizer loaded — otherwise fail closed
+    // and render as plain text, never unsanitized HTML (e.g. if the DOMPurify
+    // CDN is blocked or down).
+    var md = data.markdown || "";
+    if (window.marked && window.DOMPurify) {
+      briefBody.innerHTML = DOMPurify.sanitize(marked.parse(md));
+    } else {
+      briefBody.textContent = md;
+    }
     tagSourcesList();
 
     // Links (decision-maker search, sources) open in a new tab so the demo stays put.
