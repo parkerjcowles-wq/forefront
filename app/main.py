@@ -21,7 +21,9 @@ from pydantic import BaseModel
 from app import cache
 from app.config import MAX_CUSTOM_BRIEFS, SHOWCASE
 from app.research import BriefGenerationError, generate_brief
-from app.validate import InvalidCompanyName, cache_key, sanitize
+from app.validate import (
+    InvalidCompanyName, request_cache_key, sanitize, sanitize_freetext,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 WEB_DIR = BASE_DIR / "web"
@@ -34,6 +36,10 @@ app = FastAPI(title="Forefront — Prospect Intelligence Agent")
 
 class BriefRequest(BaseModel):
     company: str
+    focus: str = ""
+    call_context: str = ""
+    product: str = ""
+    price: str = ""
 
 
 def _session_id(request: Request, response: Response) -> str:
@@ -67,7 +73,12 @@ def post_brief(body: BriefRequest, request: Request, response: Response):
     except InvalidCompanyName as exc:
         return JSONResponse({"error": str(exc)}, status_code=400)
 
-    key = cache_key(company)
+    focus = sanitize_freetext(body.focus)
+    call_context = sanitize_freetext(body.call_context)
+    product = sanitize_freetext(body.product)
+    price = sanitize_freetext(body.price)
+
+    key = request_cache_key(company, focus, call_context, product, price)
 
     # Free path: a cached brief doesn't count against the session cap.
     cached = cache.cache_get(key)
@@ -88,7 +99,10 @@ def post_brief(body: BriefRequest, request: Request, response: Response):
         )
 
     try:
-        result = generate_brief(company)
+        result = generate_brief(
+            company, focus=focus, call_context=call_context,
+            product=product, price=price,
+        )
     except BriefGenerationError as exc:
         return JSONResponse({"error": str(exc)}, status_code=502)
 

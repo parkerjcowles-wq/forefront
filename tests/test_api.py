@@ -22,10 +22,11 @@ def client():
 
 
 def _fake_brief(*, sources=None):
-    calls = {"n": 0}
+    calls = {"n": 0, "last": None}
 
-    def _gen(company):
+    def _gen(company, **kwargs):
         calls["n"] += 1
+        calls["last"] = kwargs
         return {"markdown": f"## Company Snapshot\nBrief for {company}.",
                 "sources": sources or ["https://example.com/src"]}
 
@@ -98,10 +99,30 @@ def test_brief_session_cap_returns_429(client, monkeypatch):
 def test_brief_generation_error_returns_502(client, monkeypatch):
     from app.research import BriefGenerationError
 
-    def boom(company):
+    def boom(company, **kwargs):
         raise BriefGenerationError("research service down")
 
     monkeypatch.setattr(main, "generate_brief", boom)
     r = client.post("/api/brief", json={"company": "Honeywell"})
     assert r.status_code == 502
     assert "research service down" in r.json()["error"]
+
+
+def test_brief_accepts_optional_fields(client, monkeypatch):
+    gen, calls = _fake_brief()
+    monkeypatch.setattr(main, "generate_brief", gen)
+    r = client.post("/api/brief", json={
+        "company": "Acme", "focus": "marketing",
+        "call_context": "renewal call", "product": "Widget", "price": "$40k",
+    })
+    assert r.status_code == 200
+    assert calls["last"]["focus"] == "marketing"
+    assert calls["last"]["product"] == "Widget"
+
+
+def test_brief_focus_changes_cache_key(client, monkeypatch):
+    gen, calls = _fake_brief()
+    monkeypatch.setattr(main, "generate_brief", gen)
+    client.post("/api/brief", json={"company": "Acme"})
+    client.post("/api/brief", json={"company": "Acme", "focus": "marketing"})
+    assert calls["n"] == 2  # different focus -> not a cache hit
