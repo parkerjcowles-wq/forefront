@@ -52,8 +52,9 @@ _SECTION_GUIDANCE = {
         "a private company: funding, valuation, and growth signals instead. End with "
         "one line on where they appear to be heading. Prefix every factual line with "
         "'As of <month year> (verify):'. NEVER state a precise live stock price as if "
-        "current. If no market data is found, write exactly: 'Private company - no "
-        "public market data found.'"
+        "current. If — and only if — you find no financial or market signals at all, "
+        "write exactly one line: 'No public financial signals found.' Never restate, "
+        "quote, or comment on these instructions anywhere in the output."
     ),
     "Pain Points & Signals": (
         "3-5 bullets. Each is a SPECIFIC, sourced signal of operational stress or "

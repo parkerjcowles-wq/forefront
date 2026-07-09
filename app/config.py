@@ -52,6 +52,7 @@ SHOWCASE = {
     "kinaxis": "Kinaxis",
     "honeywell": "Honeywell",
     "lindt": "Lindt & Sprüngli",
+    "hubspot-marketing": "HubSpot (Marketing focus)",
 }
 
 # --- Target verticals (domain cheat-sheet, surfaced to the model) ------------

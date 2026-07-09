@@ -1,49 +1,38 @@
 ## Company Snapshot
+Lindt & Sprüngli is a Swiss-based premium chocolate manufacturer with a strong global presence, operating in the food processing industry. The company has achieved significant growth and has a substantial revenue, with sales reaching CHF 5.92 billion in 2025, and employs a large workforce, although the exact number is not publicly disclosed.
 
-Lindt & Sprüngli is a Swiss premium chocolate manufacturer headquartered in Kilchberg,
-Switzerland, publicly listed on the SIX Swiss Exchange. It makes and sells premium
-chocolate (Lindor, Excellence, seasonal lines, Ghirardelli in the US) through retail, its
-own boutiques, and DTC. US operations include a site in Stratham, NH. Business model:
-premium CPG manufacturing with strong brand and seasonal demand peaks.
+## Financial Pulse & Trajectory
+As of March 2026 (verify): Lindt & Sprüngli has seen its stock trend upward, with a 5-day change of +1.83% and a 1st Jan change of +1.83%, although it has experienced a decline of -18.64% over a certain period. As of March 2026 (verify): The company has reported strong financial results, with double-digit organic growth and higher profitability. As of March 2026 (verify): The company faces upward pressure on transport and packaging costs due to rising oil prices. As of March 2026 (verify): Lindt & Sprüngli appears to be heading towards continued growth, with a focus on premiumization, innovations, and price increases, despite challenges from commodity volatility and rising costs.
 
 ## Supply Chain & Ops Profile
-
-- **Stack:** an enterprise SAP environment typical of a global CPG (ERP backbone, with
-  demand/supply planning likely on SAP APO or IBP).
-- **Logistics model:** owned manufacturing plus distribution; premium positioning means
-  tight quality and freshness control.
-- **Profile:** highly seasonal (Easter and Christmas drive a large share of volume),
-  perishable-sensitive, promo-driven at retail.
+Lindt & Sprüngli has a complex supply chain, with 12 production sites and a diversified retail, wholesale, and digital channel strategy. The company uses SAP systems, including SAP S/4HANA and SAP EWM, to manage its logistics and supply chain operations. Additionally, Lindt & Sprüngli has implemented Lobster software to improve supply chain visibility and automate processes.
 
 ## Pain Points & Signals
-
-- The 2024 surge in cocoa prices to record highs pressured input costs across premium
-  chocolate — a direct driver of margin, sourcing, and forecasting scrutiny.
-- Steep seasonal demand peaks (Easter, Christmas) make forecast accuracy and capacity
-  planning unusually high-stakes — over/under-build is expensive on both sides.
-- Premium-CPG promo volatility at retail complicates demand sensing and replenishment.
+* The company faces pressure from rising transport and packaging costs due to higher oil prices, which may impact its profitability (https://www.packnode.org/en/latest/lindt-cfo-warns-of-rising-transport-and-packaging-costs).
+* Lindt & Sprüngli is exposed to commodity volatility, particularly in cocoa prices, which can impact its margins and profitability (https://www.world-today-news.com/belgian-swiss-chocolate-producer-hit-by-lower-cocoa-prices/).
+* The company has experienced supply chain challenges, including a need for improved transparency and data availability, which it has addressed through the implementation of Lobster software (https://www.lobstersoftware.com/en/customer-stories/lindt-sprungli/).
+* Lindt & Sprüngli has announced job cuts in the European chocolate sector, highlighting the pressure on chocolate manufacturers to manage costs and improve efficiency (https://commodity-board.com/ritter-sport-cuts-jobs-after-losses-as-cocoa-cost-shock-reshapes-european-chocolate-margins).
+* The company's maintenance team has faced challenges with unplanned downtime and machine efficiency, which it has addressed through the implementation of SAP Field Service Management (https://www.spadoom.com/en/success-stories/lindt-factory-maintenance/).
 
 ## Decision-Maker Profiles
-
 | Title | LinkedIn | Notes |
-|---|---|---|
-| VP Supply Chain (US / Lindt USA) | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20USA%20VP%20supply%20chain) | Stratham, NH ops — the nearest beachhead |
-| Director Demand / Supply Planning | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20director%20demand%20planning) | Owns the seasonal-forecasting pain |
-| Director Procurement / Cocoa Sourcing | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20procurement%20director) | Feels the cocoa-cost pressure first |
-
-*Confirm the current holder on LinkedIn the week of the call.*
+| --- | --- | --- |
+| Demand Planning Analyst | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20%26%20Sprüngli%20Demand%20Planning%20Analyst) | Responsible for demand planning and forecasting |
+| Supply Chain Project Manager | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20%26%20Sprüngli%20Supply%20Chain%20Project%20Manager) | Oversees supply chain operations and projects |
+| SAP IBP Architect | [search](https://www.linkedin.com/search/results/people/?keywords=Lindt%20%26%20Sprüngli%20SAP%20IBP%20Architect) | Leads the implementation and development of SAP IBP solutions |
+*Confirm the current holder on LinkedIn before the call.*
 
 ## Talking Points
-
-- "With cocoa at record highs, how much of the response is sourcing strategy versus tighter
-  demand forecasting to protect margin?" Ties to a specific, current pressure.
-- "Easter and Christmas concentrate so much volume — where does forecast error cost you most,
-  build-ahead or stockouts?" Opens the core seasonal pain.
-- "Are you sensing retail promo demand on SAP IBP today, or supplementing it with something
-  more responsive?" Probes the stack precisely.
+* How does Lindt & Sprüngli's use of SAP S/4HANA and SAP EWM impact its logistics and supply chain operations, and what benefits has the company seen from its implementation?
+* What challenges has the company faced in terms of supply chain visibility and data availability, and how has the implementation of Lobster software addressed these issues?
+* How does the company's focus on premiumization and innovation impact its demand planning and forecasting processes, and what role does the Demand Planning Analyst play in supporting this strategy?
 
 ## Sources
-
-- https://www.lindt-spruengli.com/
-- https://www.lindt-spruengli.com/investors
-- https://www.lindtusa.com/
+* https://www.marketscreener.com/quote/stock/LINDT-73888/news/Lindt-2024-Annual-Report-49224343/
+* https://www.moneycontroller.co.uk/finance-news/chocoladefabriken-lindt-sprungli-ag/2024-annual-report-2745540
+* https://www.lobstersoftware.com/en/customer-stories/lindt-sprungli/
+* https://www.packnode.org/en/latest/lindt-cfo-warns-of-rising-transport-and-packaging-costs
+* https://www.world-today-news.com/belgian-swiss-chocolate-producer-hit-by-lower-cocoa-prices/
+* https://www.spadoom.com/en/success-stories/lindt-factory-maintenance/
+* https://commodity-board.com/ritter-sport-cuts-jobs-after-losses-as-cocoa-cost-shock-reshapes-european-chocolate-margins
+* https://www.lindt-spruengli.com/press-releases-and-news/lindt-sprungli-achieves-double-digit-organic-growth-and-higher-profitability-in-2025/
