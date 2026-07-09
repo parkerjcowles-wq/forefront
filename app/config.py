@@ -11,7 +11,7 @@ import os
 # Groq's free-tier Llama writes the brief from web results that Exa pulls.
 GROQ_MODEL = os.environ.get("FOREFRONT_MODEL", "llama-3.3-70b-versatile")
 GROQ_TEMPERATURE = 0.4
-MAX_TOKENS = 2600  # Llama output ceiling for one brief
+MAX_TOKENS = 3400  # Llama output ceiling for one (now longer) brief
 
 # Exa neural search
 EXA_URL = "https://api.exa.ai/search"
@@ -19,13 +19,21 @@ EXA_RESULTS_PER_QUERY = 6
 EXA_SNIPPET_CHARS = 600
 EXA_TIMEOUT = 12
 
-# The Exa queries run per company ({company} is substituted). These shape the
-# brief: overview, software stack, pain signals, and hiring (best investment signal).
-EXA_QUERY_TEMPLATES = [
+# Recency: only surface material published within this window (days).
+EXA_RECENCY_DAYS = 550  # ~18 months
+
+# Default (supply-chain/ops) query templates — used when no focus is given.
+DEFAULT_QUERY_TEMPLATES = [
     "{company} company overview operations supply chain",
     "{company} ERP WMS TMS supply chain planning software stack",
     "{company} supply chain challenges restructuring layoffs news 2025 2026",
     "{company} hiring supply chain planner analyst job posting",
+]
+
+# Financial-pulse queries — always run, in addition to the focus queries.
+FINANCE_QUERY_TEMPLATES = [
+    "{company} stock price earnings report results 2025 2026",
+    "{company} revenue funding valuation financial performance",
 ]
 
 # --- Cost / abuse controls ---------------------------------------------------
@@ -57,3 +65,20 @@ TARGET_VERTICALS = {
 
 # Input guard: longest company name we'll accept before treating it as junk.
 MAX_COMPANY_NAME_LEN = 80
+
+# Longest free-text value we accept for the optional fields (focus, call
+# context, product, price). Interpolated into the prompt, so kept short.
+MAX_FREE_TEXT_LEN = 200
+
+# Deal-size cheat-sheet surfaced to the model so the estimate has a defined
+# spine. Company-size bucket -> rough annual-contract-value band.
+DEAL_SIZE_BANDS = {
+    "smb": "under ~200 employees -> ~$5k-$25k ACV",
+    "mid": "~200-2,000 employees -> ~$25k-$100k ACV",
+    "enterprise": "~2,000-20,000 employees -> ~$100k-$500k ACV",
+    "global": "20,000+ employees -> ~$500k+ ACV",
+}
+
+# Per-IP rate limit on live-brief generation (protects free Exa/Groq quotas).
+RATE_LIMIT_MAX = 20        # requests
+RATE_LIMIT_WINDOW = 60     # seconds
