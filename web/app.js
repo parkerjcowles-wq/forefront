@@ -15,6 +15,12 @@
   var briefMeta = document.getElementById("brief-meta");
   var briefBody = document.getElementById("brief-body");
   var issueDate = document.getElementById("issue-date");
+  var focusEl = document.getElementById("focus");
+  var contextEl = document.getElementById("call_context");
+  var productEl = document.getElementById("product");
+  var priceEl = document.getElementById("price");
+  var copyBtn = document.getElementById("copy-brief");
+  var printBtn = document.getElementById("print-brief");
 
   if (window.marked) {
     marked.setOptions({ gfm: true, breaks: false });
@@ -102,17 +108,23 @@
     brief.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  // Give the trailing Sources list its footnote styling.
+  // Collapse the trailing Sources list into an accordion.
   function tagSourcesList() {
     var heads = briefBody.querySelectorAll("h2");
     for (var i = 0; i < heads.length; i++) {
-      if (/sources/i.test(heads[i].textContent)) {
-        var n = heads[i].nextElementSibling;
-        while (n) {
-          if (n.tagName === "UL" || n.tagName === "OL") n.classList.add("sources");
-          n = n.nextElementSibling;
-        }
-      }
+      if (!/sources/i.test(heads[i].textContent)) continue;
+      var list = heads[i].nextElementSibling;
+      if (!list || (list.tagName !== "UL" && list.tagName !== "OL")) continue;
+      var details = document.createElement("details");
+      details.className = "sources-drawer";
+      var summary = document.createElement("summary");
+      summary.textContent = heads[i].textContent;
+      details.appendChild(summary);
+      list.classList.add("sources");
+      heads[i].parentNode.insertBefore(details, heads[i]);
+      details.appendChild(list);          // move list into the drawer
+      heads[i].parentNode.removeChild(heads[i]);  // drop the now-duplicate H2
+      break;
     }
   }
 
@@ -128,7 +140,13 @@
     fetch("/api/brief", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ company: company }),
+      body: JSON.stringify({
+        company: company,
+        focus: (focusEl.value || "").trim(),
+        call_context: (contextEl.value || "").trim(),
+        product: (productEl.value || "").trim(),
+        price: (priceEl.value || "").trim(),
+      }),
     })
       .then(function (res) {
         if (!res.ok) return readError(res).then(function (m) { throw new Error(m); });
@@ -162,4 +180,17 @@
     if (!btn) return;
     loadShowcase(btn.getAttribute("data-slug"), btn.textContent.trim());
   });
+
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var text = briefBody.innerText || "";
+      navigator.clipboard.writeText(text).then(
+        function () { copyBtn.textContent = "Copied"; setTimeout(function () { copyBtn.textContent = "Copy"; }, 1500); },
+        function () { copyBtn.textContent = "Copy failed"; }
+      );
+    });
+  }
+  if (printBtn) {
+    printBtn.addEventListener("click", function () { window.print(); });
+  }
 })();

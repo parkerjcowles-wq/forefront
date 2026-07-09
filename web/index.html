@@ -37,35 +37,29 @@
     </header>
 
     <main>
-      <section class="hero">
-        <p class="kicker reveal" style="--d:1">Pre-call intelligence, in one page</p>
-        <h1 class="reveal" style="--d:2">
-          Walk into every call<br />
-          already <em>briefed</em>.
-        </h1>
-        <p class="lede reveal" style="--d:3">
-          Name any company. Forefront researches the live web and writes the
-          one-page account brief a top sales rep would prep before a discovery
-          call — stack, pain signals, decision-makers, and the questions that
-          open the deal.
-        </p>
+      <section class="lead reveal" style="--d:1">
+        <p class="kicker">Pre-call sales intelligence, in one page</p>
+        <h1>Walk in already <em>briefed</em>.</h1>
       </section>
 
-      <section class="console reveal" style="--d:4">
-        <form id="brief-form" class="search" autocomplete="off">
-          <input
-            id="company"
-            class="search__input"
-            type="text"
-            placeholder="Enter a company — e.g. project44"
-            aria-label="Company name"
-            maxlength="80"
-          />
-          <button id="submit" class="search__btn" type="submit">
-            Generate <span aria-hidden="true">&rarr;</span>
-          </button>
+      <section class="console reveal" style="--d:2">
+        <form id="brief-form" class="form" autocomplete="off">
+          <div class="form__row">
+            <input id="company" class="field" type="text" maxlength="80" required
+                   placeholder="Company — e.g. project44" aria-label="Company" />
+            <input id="focus" class="field" type="text" maxlength="200"
+                   placeholder="Focus / department (optional) — e.g. marketing" aria-label="Focus" />
+          </div>
+          <input id="call_context" class="field" type="text" maxlength="200"
+                 placeholder="What's this call about? (optional)" aria-label="Call context" />
+          <div class="form__row form__row--deal">
+            <input id="product" class="field" type="text" maxlength="200"
+                   placeholder="Product you're pitching (optional)" aria-label="Product" />
+            <input id="price" class="field" type="text" maxlength="200"
+                   placeholder="Price / model (optional)" aria-label="Price" />
+          </div>
+          <button id="submit" class="btn" type="submit">Generate brief <span aria-hidden="true">&rarr;</span></button>
         </form>
-
         <div class="samples">
           <span class="samples__label">Or pull a sample dossier</span>
           <div class="chips" id="chips">
@@ -90,6 +84,10 @@
           <p class="brief__eyebrow" id="brief-eyebrow">Account Brief</p>
           <h2 class="brief__company" id="brief-company"></h2>
           <p class="brief__meta" id="brief-meta"></p>
+          <div class="brief__actions">
+            <button id="copy-brief" class="brief__action" type="button">Copy</button>
+            <button id="print-brief" class="brief__action" type="button">Print / PDF</button>
+          </div>
         </div>
         <div class="brief__body" id="brief-body"></div>
       </article>
@@ -106,6 +104,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js" integrity="sha384-/TQbtLCAerC3jgaim+N78RZSDYV7ryeoBCVqTuzRrFec2akfBkHS7ACQ3PQhvMVi" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js" integrity="sha384-+VfUPEb0PdtChMwmBcBmykRMDd+v6D/oFmB3rZM/puCMDYcIvF968OimRh4KQY9a" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script src="/app.js?v=4"></script>
+  <script src="/app.js?v=5"></script>
 </body>
 </html>
