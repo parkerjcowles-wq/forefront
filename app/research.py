@@ -145,17 +145,21 @@ def _parse_sources(markdown: str, results: List[dict]) -> List[str]:
 
 def generate_brief(
     company: str,
+    *,
+    focus: str = "",
+    call_context: str = "",
+    product: str = "",
+    price: str = "",
     groq_client=None,
-    searcher: Optional[Callable[[str], List[dict]]] = None,
+    searcher: Optional[Callable[..., List[dict]]] = None,
 ) -> dict:
-    """Generate a sourced account brief for `company`.
-
-    Returns {"markdown": str, "sources": [str]}. Raises BriefGenerationError.
-    `groq_client` and `searcher` are injectable for offline testing.
-    """
+    """Generate a sourced account brief. Returns {"markdown", "sources"}."""
     search = searcher or exa_search
     try:
-        results = search(company)
+        try:
+            results = search(company, focus)          # focus-aware searcher
+        except TypeError:
+            results = search(company)                 # test searchers take company only
     except BriefGenerationError:
         raise
     except Exception as exc:  # noqa: BLE001
@@ -169,8 +173,12 @@ def generate_brief(
     if groq_client is None:
         groq_client = get_groq_client()
 
-    user_msg = build_user_message(company, _format_research(results))
-    system_prompt = build_system_prompt("", False)
+    has_product = bool(product.strip())
+    system_prompt = build_system_prompt(focus, has_product)
+    user_msg = build_user_message(
+        company, _format_research(results), focus=focus,
+        call_context=call_context, product=product, price=price,
+    )
 
     try:
         completion = groq_client.chat.completions.create(
@@ -185,12 +193,11 @@ def generate_brief(
         markdown = (completion.choices[0].message.content or "").strip()
     except BriefGenerationError:
         raise
-    except Exception as exc:  # noqa: BLE001 — surface a clean message to the API layer
+    except Exception as exc:  # noqa: BLE001
         raise BriefGenerationError(f"The synthesis service hit an error: {exc}") from exc
 
     if not markdown:
         raise BriefGenerationError(
             "No brief was returned — try again or pick a showcase company."
         )
-
     return {"markdown": markdown, "sources": _parse_sources(markdown, results)}

@@ -98,6 +98,19 @@ def test_sources_fall_back_to_results_when_brief_omits_urls():
 from app import research
 
 
+def test_generate_brief_passes_focus_and_product_into_prompt():
+    groq = FakeGroq(text="## Company Snapshot\nok")
+    generate_brief(
+        "Acme", focus="marketing", call_context="renewal", product="Widget",
+        price="$40k", groq_client=groq, searcher=_searcher(SAMPLE_RESULTS),
+    )
+    system_turn = groq.last_messages[0]["content"]
+    user_turn = groq.last_messages[1]["content"]
+    assert "Marketing Profile" in system_turn      # dynamic section title
+    assert "Deal & Pricing" in system_turn          # product -> deal section
+    assert "Widget" in user_turn and "renewal" in user_turn
+
+
 def test_exa_search_is_focus_aware_and_concurrent(monkeypatch):
     seen_queries = []
 
