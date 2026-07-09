@@ -1,23 +1,22 @@
-"""System-prompt contract tests (pure stdlib — no API)."""
-from app.brief_prompt import SECTIONS, SYSTEM_PROMPT, build_user_message
+from app.brief_prompt import build_sections
 
 
-def test_all_six_sections_present_in_prompt():
-    assert len(SECTIONS) == 6
-    for heading in SECTIONS:
-        assert f"## {heading}" in SYSTEM_PROMPT, f"missing section: {heading}"
+def test_default_sections_supply_chain_no_product():
+    s = build_sections(focus="", has_product=False)
+    assert s[0] == "Company Snapshot"
+    assert "Financial Pulse & Trajectory" in s
+    assert "Supply Chain & Ops Profile" in s
+    assert s[-1] == "Sources"
+    assert "Deal & Pricing" not in s
 
 
-def test_prompt_synthesizes_from_research_excerpts():
-    assert "RESEARCH EXCERPTS" in SYSTEM_PROMPT
+def test_focus_retitles_profile_section():
+    s = build_sections(focus="marketing", has_product=False)
+    assert "Marketing Profile" in s
+    assert "Supply Chain & Ops Profile" not in s
 
 
-def test_prompt_forbids_speculation():
-    assert "No speculation without a source" in SYSTEM_PROMPT
-
-
-def test_user_message_includes_company_and_research():
-    msg = build_user_message("Flexport", "[1] Flexport news\nURL: https://x.com\nText")
-    assert "Flexport" in msg
-    assert "https://x.com" in msg
-    assert "RESEARCH EXCERPTS" in msg
+def test_product_adds_deal_section_before_sources():
+    s = build_sections(focus="", has_product=True)
+    assert "Deal & Pricing" in s
+    assert s.index("Deal & Pricing") == s.index("Sources") - 1

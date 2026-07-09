@@ -6,15 +6,22 @@ The six section headers are a contract the frontend and tests both depend on.
 """
 from __future__ import annotations
 
-# Section headers — single source of truth (frontend renders these, tests assert them).
-SECTIONS = [
-    "Company Snapshot",
-    "Supply Chain & Ops Profile",
-    "Pain Points & Signals",
-    "Decision-Maker Profiles",
-    "Talking Points",
-    "Sources",
-]
+def build_sections(focus: str, has_product: bool) -> list[str]:
+    """The ordered section contract for one brief. Frontend + tests depend on it."""
+    focus_title = f"{focus.strip().title()} Profile" if focus.strip() else \
+        "Supply Chain & Ops Profile"
+    sections = [
+        "Company Snapshot",
+        "Financial Pulse & Trajectory",
+        focus_title,
+        "Pain Points & Signals",
+        "Decision-Maker Profiles",
+        "Talking Points",
+    ]
+    if has_product:
+        sections.append("Deal & Pricing")
+    sections.append("Sources")
+    return sections
 
 SYSTEM_PROMPT = """\
 You are the lead sales strategist on an elite B2B enterprise sales team that sells \
