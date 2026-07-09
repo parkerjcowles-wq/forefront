@@ -9,11 +9,12 @@ import threading
 import time
 from typing import Dict, Optional, Tuple
 
-from app.config import CACHE_TTL_SECONDS, MAX_CUSTOM_BRIEFS
+from app.config import CACHE_TTL_SECONDS, MAX_CUSTOM_BRIEFS, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW
 
 _lock = threading.Lock()
 _brief_cache: Dict[str, Tuple[float, dict]] = {}      # key -> (expires_at, value)
 _session_counts: Dict[str, int] = {}                  # session id -> custom-brief count
+_ip_hits: Dict[str, list] = {}  # ip -> [timestamps]
 
 
 def cache_get(key: str) -> Optional[dict]:
@@ -49,8 +50,19 @@ def increment_session(session_id: str) -> int:
         return _session_counts[session_id]
 
 
+def ip_rate_limited(ip: str) -> bool:
+    """Record one hit for `ip`; return True if it exceeds the window budget."""
+    now = time.time()
+    with _lock:
+        hits = [t for t in _ip_hits.get(ip, []) if now - t < RATE_LIMIT_WINDOW]
+        hits.append(now)
+        _ip_hits[ip] = hits
+        return len(hits) > RATE_LIMIT_MAX
+
+
 def reset() -> None:
     """Clear all state — used by tests."""
     with _lock:
         _brief_cache.clear()
         _session_counts.clear()
+        _ip_hits.clear()

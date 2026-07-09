@@ -76,6 +76,13 @@ def _session_id(request: Request, response: Response) -> str:
     return sid
 
 
+def _client_ip(request: Request) -> str:
+    fwd = request.headers.get("x-forwarded-for", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 @app.get("/api/showcase/{slug}")
 def get_showcase(slug: str):
     if slug not in SHOWCASE:
@@ -90,6 +97,13 @@ def get_showcase(slug: str):
 @app.post("/api/brief")
 def post_brief(body: BriefRequest, request: Request, response: Response):
     sid = _session_id(request, response)
+
+    if cache.ip_rate_limited(_client_ip(request)):
+        return JSONResponse(
+            {"error": "Too many requests — slow down and try again shortly.",
+             "rate_limited": True},
+            status_code=429,
+        )
 
     try:
         company = sanitize(body.company)
