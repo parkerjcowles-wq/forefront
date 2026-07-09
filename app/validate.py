@@ -5,10 +5,11 @@ prompt-injection / junk-input guard. Keep it strict and dependency-free.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import unicodedata
 
-from app.config import MAX_COMPANY_NAME_LEN
+from app.config import MAX_COMPANY_NAME_LEN, MAX_FREE_TEXT_LEN
 
 
 class InvalidCompanyName(ValueError):
@@ -60,3 +61,31 @@ def sanitize(raw: str) -> str:
 def cache_key(name: str) -> str:
     """Normalized key for caching (case/space-insensitive)."""
     return _WHITESPACE.sub(" ", name).strip().lower()
+
+
+# Free-text guard for the optional fields. Looser than company names (allows
+# sentence punctuation) but strips control chars and the braces that would
+# break str.format() when the value is interpolated into a query template.
+_FREETEXT_DISALLOWED = re.compile(r"[{}<>]")
+
+
+def sanitize_freetext(raw: str | None) -> str:
+    """Clean an optional free-text field; returns '' when empty/None."""
+    if not raw:
+        return ""
+    text = unicodedata.normalize("NFKC", str(raw))
+    text = _WHITESPACE.sub(" ", text)
+    text = "".join(ch for ch in text if not unicodedata.category(ch).startswith("C"))
+    text = _FREETEXT_DISALLOWED.sub(" ", text)
+    text = _WHITESPACE.sub(" ", text).strip()
+    return text[:MAX_FREE_TEXT_LEN]
+
+
+def request_cache_key(company: str, focus: str, call_context: str,
+                      product: str, price: str) -> str:
+    """Stable cache key across all brief inputs (case/space-insensitive)."""
+    parts = [
+        _WHITESPACE.sub(" ", (p or "")).strip().lower()
+        for p in (company, focus, call_context, product, price)
+    ]
+    return hashlib.sha256("\x1f".join(parts).encode("utf-8")).hexdigest()
