@@ -133,3 +133,37 @@ def test_exa_search_is_focus_aware_and_concurrent(monkeypatch):
     assert "marketing" in joined          # focus queries used
     assert "earnings" in joined or "revenue" in joined  # finance queries included
     assert out and out[0]["published"] == "2026-01-01"
+
+
+def test_parse_sources_drops_individual_linkedin_profiles():
+    from app.research import _parse_sources
+    md = ("See https://example.com/a and "
+          "https://www.linkedin.com/in/jane-doe and "
+          "https://www.linkedin.com/search/results/people/?keywords=Acme%20CEO")
+    out = _parse_sources(md, [])
+    assert "https://example.com/a" in out
+    assert not any("/in/" in u for u in out)                 # profile filtered out
+    assert any("search/results/people" in u for u in out)    # search link kept
+
+
+def test_run_query_retries_without_recency_when_filtered_empty(monkeypatch):
+    calls = []
+
+    class R:
+        def __init__(self, data):
+            self._d = data
+        def raise_for_status(self):
+            pass
+        def json(self):
+            return {"results": self._d}
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        calls.append(json)
+        if "startPublishedDate" in json:
+            return R([])  # recency-filtered pass finds nothing
+        return R([{"title": "t", "url": "https://ex.com/a", "text": "x", "publishedDate": ""}])
+
+    monkeypatch.setattr(research.requests, "post", fake_post)
+    res = research._run_query("q", "key", "2025-01-01")
+    assert len(calls) == 2  # filtered attempt, then unfiltered retry
+    assert res and res[0]["url"] == "https://ex.com/a"

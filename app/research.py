@@ -52,22 +52,32 @@ def _recency_date() -> str:
 
 
 def _run_query(query: str, api_key: str, start_date: str) -> list[dict]:
-    try:
+    base = {
+        "query": query,
+        "numResults": EXA_RESULTS_PER_QUERY,
+        "useAutoprompt": True,
+        "type": "neural",
+        "contents": {"text": {"maxCharacters": EXA_SNIPPET_CHARS}},
+    }
+
+    def _post(payload: dict) -> list[dict]:
         resp = requests.post(
             EXA_URL,
             headers={"x-api-key": api_key, "Content-Type": "application/json"},
-            json={
-                "query": query,
-                "numResults": EXA_RESULTS_PER_QUERY,
-                "useAutoprompt": True,
-                "type": "neural",
-                "startPublishedDate": start_date,
-                "contents": {"text": {"maxCharacters": EXA_SNIPPET_CHARS}},
-            },
+            json=payload,
             timeout=EXA_TIMEOUT,
         )
         resp.raise_for_status()
         return resp.json().get("results", [])
+
+    try:
+        results = _post({**base, "startPublishedDate": start_date})
+        # The recency filter also drops undated pages (e.g. evergreen overview
+        # pages for thinly-covered companies). If it returned nothing, retry
+        # once unfiltered so a niche/private company doesn't come back empty.
+        if not results:
+            results = _post(base)
+        return results
     except requests.RequestException:
         return []  # one bad query shouldn't kill the brief
 
@@ -125,19 +135,28 @@ def get_groq_client():
     return groq.Groq(api_key=api_key)
 
 
+def _is_profile_url(url: str) -> bool:
+    """A specific person's LinkedIn profile — not a citable source for a brief.
+
+    LinkedIn people-*search* links (/search/results/people/) stay; those are the
+    decision-maker links. Only individual /in/ profiles are filtered out.
+    """
+    return "linkedin.com/in/" in url.lower()
+
+
 def _parse_sources(markdown: str, results: List[dict]) -> List[str]:
     """Unique source URLs: those cited in the brief, else fall back to all results."""
     seen = set()
     out: List[str] = []
     for url in _URL_RE.findall(markdown or ""):
         url = url.rstrip(".,);")
-        if url not in seen:
+        if url not in seen and not _is_profile_url(url):
             seen.add(url)
             out.append(url)
     if not out:
         for r in results:
             u = r.get("url", "")
-            if u and u not in seen:
+            if u and u not in seen and not _is_profile_url(u):
                 seen.add(u)
                 out.append(u)
     return out

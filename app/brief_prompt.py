@@ -43,7 +43,10 @@ rather than inventing it. Favor the most recent signals.
 _SECTION_GUIDANCE = {
     "Company Snapshot": (
         "Industry/segment, HQ and size (employees, revenue if public), business "
-        "model, and what they actually make or do in 1-2 sentences."
+        "model, and what they actually make or do in 1-2 sentences. Tag any specific "
+        "financial figure you cite (revenue, valuation, market cap) with "
+        "'As of <month year> (verify):' — never state a bare current financial number "
+        "as settled fact."
     ),
     "Financial Pulse & Trajectory": (
         "Web-sourced and QUALITATIVE. For a public company: recent stock trend in "

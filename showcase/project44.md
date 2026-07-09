@@ -1,29 +1,29 @@
 ## Company Snapshot
-Project44 is a supply chain visibility platform providing real-time tracking and predictive intelligence for ocean freight, air freight, truckload, LTL, and rail shipments across global supply chains. Founded in 2014 in Chicago, the company has raised over $870 million at a $2.7 billion valuation.
+Project44 is a supply chain visibility platform providing real-time tracking and predictive intelligence for ocean freight, air freight, truckload, LTL (less-than-truckload), and rail shipments across global supply chains, founded in 2014 in Chicago. As of the latest available data, the company has raised over $870 million at a $2.7 billion valuation.
 
 ## Financial Pulse & Trajectory
-As of February 2026 (verify): project44 achieved its first positive operating free cash flow quarter with 48% new ARR growth in Q4. As of May 2026 (verify): the company delivered 34% year-over-year growth in new Annual Recurring Revenue. As of November 2025 (verify): project44 achieved operational cash flow breakeven while maintaining strong growth metrics. The company appears to be heading towards continued growth and expansion.
+As of November 2025 (verify): project44 achieved operational cash flow breakeven while maintaining strong growth metrics. As of February 2026 (verify): the company delivered 48% year-over-year growth in new Annual Recurring Revenue (ARR) and achieved its first quarter of positive Operating Free Cash Flow. As of May 2026 (verify): project44 reported 34% ARR growth driven by AI and TMS. The company appears to be heading towards sustained growth and profitability.
 
 ## Supply Chain & Ops Profile
-Project44's software stack includes its Decision Intelligence Platform, Movement, and integrates with systems such as SAP and Oracle SCM Cloud. The company's logistics model involves working with a large network of carriers, with over 3,745 carriers recognized as part of its annual Preferred Carrier Program. Project44's manufacturing vs. asset-light profile is not explicitly stated, but its focus on supply chain visibility and transportation management suggests a more asset-light approach.
+Project44's known software stack includes integrations with SAP and Oracle SCM Cloud. The company operates a Decision Intelligence Platform for the modern supply chain, providing real-time tracking and predictive intelligence. Project44 also offers an Intelligent Transportation Management System (TMS) and has launched Autopilot, a no-code platform for deploying AI agents.
 
 ## Pain Points & Signals
-* Project44 is pushing for real-time visibility, which may be forcing 3PLs to adapt or lose contracts, indicating a potential pain point for its partners and customers. [14]
-* The company is investing in AI-powered automation, including the launch of its Autopilot platform, which may indicate a need to improve efficiency and reduce costs. [3]
-* Project44 is experiencing rapid growth, which can lead to scaling challenges and the need for increased operational efficiency. [2]
+* Project44 recognizes the need for better supply chain management, as evident from their launch of Autopilot to cut freight costs and improve data quality (https://www.project44.com/press-releases/project44-launches-autopilot-to-cut-freight-costs-improve-data-quality-optimize-inventory-levels-and-accelerate-cash-flow/).
+* The company is focused on providing real-time visibility, which is forcing 3PLs to adapt or lose contracts (https://ecommerce-times.com/project44s-real-time-visibility-push-is-forcing-3pls-to-adapt-or-lose-contracts/).
+* Project44 is investing in AI and TMS, driving 34% ARR growth, indicating a strong focus on technology and innovation (https://www.project44.com/press-releases/project44-delivers-34-new-arr-growth-fueled-by-ai-agent-momentum-and-intelligent-tms-expansion/).
 
 ## Decision-Maker Profiles
 | Title | LinkedIn | Notes |
 | --- | --- | --- |
-| CEO | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20CEO) | Overall strategy and direction |
-| Head of Supply Chain | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20Head%20of%20Supply%20Chain) | Supply chain operations and logistics |
-| Director of Transportation Management | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20Director%20of%20Transportation%20Management) | Transportation management and carrier relations |
+| Staff Product Manager, Agentic AI | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20Staff%20Product%20Manager%2C%20Agentic%20AI) | Responsible for product development and strategy |
+| Carrier Integration Analyst | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20Carrier%20Integration%20Analyst) | Focuses on carrier integration and supply chain operations |
+| Data Analyst | [search](https://www.linkedin.com/search/results/people/?keywords=project44%20Data%20Analyst) | Analyzes data to inform business decisions and optimize operations |
 *Confirm the current holder on LinkedIn before the call.*
 
 ## Talking Points
-* How is project44's real-time visibility push impacting its relationships with 3PLs and other partners, and what opportunities or challenges is this creating? [14]
-* What specific pain points or challenges is project44 trying to address with its Autopilot platform, and how does this fit into its overall strategy? [3]
-* How is project44's rapid growth affecting its supply chain operations, and what steps is the company taking to maintain efficiency and scalability? [2]
+* How is project44 currently utilizing AI and TMS to drive growth and improve supply chain operations, and what are the key challenges they face in implementing these technologies?
+* Can you share more about the launch of Autopilot and how it is expected to impact project44's customers and the broader supply chain industry?
+* What are the most significant pain points in project44's supply chain operations, and how do they see real-time visibility and AI-driven insights addressing these challenges?
 
 ## Sources
 * https://www.project44.com/press-releases/project44-accelerates-growth-with-40-increase-in-new-arr-in-q3-now-achieving-operational-cash-flow-breakeven/

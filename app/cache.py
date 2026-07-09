@@ -54,6 +54,11 @@ def ip_rate_limited(ip: str) -> bool:
     """Record one hit for `ip`; return True if it exceeds the window budget."""
     now = time.time()
     with _lock:
+        # Evict IPs whose whole window has expired so the table can't grow
+        # unbounded from one-off visitors/bots on a long-lived process.
+        for stale in [k for k, ts in _ip_hits.items()
+                      if not ts or now - ts[-1] >= RATE_LIMIT_WINDOW]:
+            del _ip_hits[stale]
         hits = [t for t in _ip_hits.get(ip, []) if now - t < RATE_LIMIT_WINDOW]
         hits.append(now)
         _ip_hits[ip] = hits

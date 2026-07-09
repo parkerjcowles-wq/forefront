@@ -58,11 +58,6 @@ def sanitize(raw: str) -> str:
     return text
 
 
-def cache_key(name: str) -> str:
-    """Normalized key for caching (case/space-insensitive)."""
-    return _WHITESPACE.sub(" ", name).strip().lower()
-
-
 # Free-text guard for the optional fields. Looser than company names (allows
 # sentence punctuation) but strips control chars and the braces that would
 # break str.format() when the value is interpolated into a query template.

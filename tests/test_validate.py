@@ -1,7 +1,7 @@
 """Input sanitization / injection-guard tests (pure stdlib — no API)."""
 import pytest
 
-from app.validate import InvalidCompanyName, cache_key, sanitize
+from app.validate import InvalidCompanyName, sanitize
 
 
 def test_clean_name_passes_through():
@@ -42,10 +42,6 @@ def test_pure_punctuation_raises():
 def test_overlong_raises():
     with pytest.raises(InvalidCompanyName):
         sanitize("A" * 200)
-
-
-def test_cache_key_is_case_and_space_insensitive():
-    assert cache_key("Project44") == cache_key("  project44 ")
 
 
 from app.validate import sanitize_freetext, request_cache_key
