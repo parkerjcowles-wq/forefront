@@ -93,3 +93,30 @@ def test_sources_fall_back_to_results_when_brief_omits_urls():
         "https://flexport.com/about",
         "https://news.example.com/flexport",
     ]
+
+
+from app import research
+
+
+def test_exa_search_is_focus_aware_and_concurrent(monkeypatch):
+    seen_queries = []
+
+    class FakeResp:
+        status_code = 200
+        def raise_for_status(self): pass
+        def json(self):
+            return {"results": [{"title": "t", "url": "https://ex.com/a",
+                                 "text": "body", "publishedDate": "2026-01-01"}]}
+
+    def fake_post(url, headers=None, json=None, timeout=None):
+        seen_queries.append(json["query"])
+        assert "startPublishedDate" in json  # recency filter applied
+        return FakeResp()
+
+    monkeypatch.setenv("EXA_API_KEY", "test-key")
+    monkeypatch.setattr(research.requests, "post", fake_post)
+    out = research.exa_search("Acme", focus="marketing")
+    joined = " ".join(seen_queries)
+    assert "marketing" in joined          # focus queries used
+    assert "earnings" in joined or "revenue" in joined  # finance queries included
+    assert out and out[0]["published"] == "2026-01-01"

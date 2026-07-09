@@ -8,13 +8,17 @@ from __future__ import annotations
 
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
 from typing import Callable, List, Optional
 
 import requests
 
-from app.brief_prompt import SYSTEM_PROMPT, build_user_message
+from app.brief_prompt import build_system_prompt, build_user_message
 from app.config import (
-    EXA_QUERY_TEMPLATES,
+    DEFAULT_QUERY_TEMPLATES,
+    FINANCE_QUERY_TEMPLATES,
+    EXA_RECENCY_DAYS,
     EXA_RESULTS_PER_QUERY,
     EXA_SNIPPET_CHARS,
     EXA_TIMEOUT,
@@ -33,54 +37,77 @@ class BriefGenerationError(RuntimeError):
 
 # --- Web search (Exa) -------------------------------------------------------
 
-def exa_search(company: str) -> List[dict]:
-    """Run the per-company Exa queries; return deduped [{title, url, text}]."""
+def _build_queries(company: str, focus: str) -> list[str]:
+    base = DEFAULT_QUERY_TEMPLATES if not focus.strip() else [
+        "{company} " + focus.strip() + " team leadership organization",
+        "{company} " + focus.strip() + " strategy priorities 2025 2026",
+        "{company} " + focus.strip() + " software tools technology stack",
+        "{company} " + focus.strip() + " challenges news 2025 2026",
+    ]
+    return [t.format(company=company) for t in (*base, *FINANCE_QUERY_TEMPLATES)]
+
+
+def _recency_date() -> str:
+    return (datetime.now(timezone.utc) - timedelta(days=EXA_RECENCY_DAYS)).strftime("%Y-%m-%d")
+
+
+def _run_query(query: str, api_key: str, start_date: str) -> list[dict]:
+    try:
+        resp = requests.post(
+            EXA_URL,
+            headers={"x-api-key": api_key, "Content-Type": "application/json"},
+            json={
+                "query": query,
+                "numResults": EXA_RESULTS_PER_QUERY,
+                "useAutoprompt": True,
+                "type": "neural",
+                "startPublishedDate": start_date,
+                "contents": {"text": {"maxCharacters": EXA_SNIPPET_CHARS}},
+            },
+            timeout=EXA_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return resp.json().get("results", [])
+    except requests.RequestException:
+        return []  # one bad query shouldn't kill the brief
+
+
+def exa_search(company: str, focus: str = "") -> list[dict]:
+    """Run focus + finance queries concurrently; return deduped dated results."""
     api_key = os.environ.get("EXA_API_KEY", "")
     if not api_key:
         raise BriefGenerationError(
             "EXA_API_KEY is not set. Add it to .env (free key from exa.ai)."
         )
-
+    queries = _build_queries(company, focus)
+    start_date = _recency_date()
     seen: set = set()
-    results: List[dict] = []
-    for template in EXA_QUERY_TEMPLATES:
-        query = template.format(company=company)
-        try:
-            resp = requests.post(
-                EXA_URL,
-                headers={"x-api-key": api_key, "Content-Type": "application/json"},
-                json={
-                    "query": query,
-                    "numResults": EXA_RESULTS_PER_QUERY,
-                    "useAutoprompt": True,
-                    "type": "neural",
-                    "contents": {"text": {"maxCharacters": EXA_SNIPPET_CHARS}},
-                },
-                timeout=EXA_TIMEOUT,
-            )
-            resp.raise_for_status()
-            for res in resp.json().get("results", []):
-                url = (res.get("url") or "").strip()
-                if not url or url in seen:
-                    continue
-                seen.add(url)
-                results.append({
-                    "title": (res.get("title") or "").strip(),
-                    "url": url,
-                    "text": (res.get("text") or "").strip(),
-                })
-        except requests.RequestException:
-            # One bad query shouldn't kill the brief — keep what we have.
-            continue
+    results: list[dict] = []
+    with ThreadPoolExecutor(max_workers=len(queries)) as pool:
+        batches = pool.map(lambda q: _run_query(q, api_key, start_date), queries)
+    for batch in batches:
+        for res in batch:
+            url = (res.get("url") or "").strip()
+            if not url or url in seen:
+                continue
+            seen.add(url)
+            results.append({
+                "title": (res.get("title") or "").strip(),
+                "url": url,
+                "text": (res.get("text") or "").strip(),
+                "published": (res.get("publishedDate") or "").strip(),
+            })
     return results
 
 
 def _format_research(results: List[dict]) -> str:
-    """Turn Exa results into a numbered, source-tagged context block."""
     lines: List[str] = []
     for i, r in enumerate(results, 1):
         title = r.get("title") or "(untitled)"
-        lines.append(f"[{i}] {title}\nURL: {r.get('url', '')}\n{r.get('text', '')}".strip())
+        date = f" ({r['published']})" if r.get("published") else ""
+        lines.append(
+            f"[{i}] {title}{date}\nURL: {r.get('url', '')}\n{r.get('text', '')}".strip()
+        )
     return "\n\n".join(lines)
 
 
@@ -143,6 +170,7 @@ def generate_brief(
         groq_client = get_groq_client()
 
     user_msg = build_user_message(company, _format_research(results))
+    system_prompt = build_system_prompt("", False)
 
     try:
         completion = groq_client.chat.completions.create(
@@ -150,7 +178,7 @@ def generate_brief(
             max_tokens=MAX_TOKENS,
             temperature=GROQ_TEMPERATURE,
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_msg},
             ],
         )
