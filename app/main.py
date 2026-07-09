@@ -31,7 +31,30 @@ SHOWCASE_DIR = BASE_DIR / "showcase"
 
 SESSION_COOKIE = "ff_sid"
 
-app = FastAPI(title="Forefront — Prospect Intelligence Agent")
+app = FastAPI(
+    title="Forefront — Prospect Intelligence Agent",
+    docs_url=None, redoc_url=None, openapi_url=None,
+)
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src https://fonts.gstatic.com; "
+        "img-src 'self' data:; "
+        "connect-src 'self'; "
+        "base-uri 'none'; frame-ancestors 'none'"
+    )
+    return response
 
 
 class BriefRequest(BaseModel):
